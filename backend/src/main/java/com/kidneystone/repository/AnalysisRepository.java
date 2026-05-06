@@ -13,4 +13,5 @@ public interface AnalysisRepository extends JpaRepository<Analysis, Long> {
     List<Analysis>findByUser(User user);
     List<Analysis>findByUserAndAnalysisTypeContainingIgnoreCase(User user, String analysisType);
     List<Analysis>findByUserAndCollectionDate(User user, LocalDate collectionDate);
+    List<Analysis>findByUserAndAnalysisTypeContainingIgnoreCaseAndCollectionDate(User user,String analysisType,LocalDate collectionDate);   
 }
