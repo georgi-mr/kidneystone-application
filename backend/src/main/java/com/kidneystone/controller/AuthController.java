@@ -1,4 +1,4 @@
-package com.kidneystone.contoller;
+package com.kidneystone.controller;
 
 import com.kidneystone.dto.AuthResponse;
 import com.kidneystone.dto.LoginRequest;

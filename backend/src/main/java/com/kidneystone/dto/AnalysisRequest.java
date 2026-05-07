@@ -4,37 +4,29 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
-public class AnalysisRequest {
-    
-    @NotNull(message="User ID is required")
-    private Long userId;
+import java.time.LocalDate;
 
-    @NotBlank(message="Analysis type is required")
+public class AnalysisRequest {
+
+    @NotBlank(message = "Analysis type is required")
     private String analysisType;
 
-    @NotNull(message="Value is required")
-    @Positive(message="Value must be positive")
+    @NotNull(message = "Value is required")
+    @Positive(message = "Value must be positive")
     private Double value;
-    
-    @NotBlank(message="Unit is required")
+
+    @NotBlank(message = "Unit is required")
     private String unit;
 
-    @NotBlank(message="Collection date is required")
-    private String collectionDate;
+    @NotNull(message = "Collection date is required")
+    private LocalDate collectionDate;
+
     public AnalysisRequest() {
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
     }
 
     public String getAnalysisType() {
         return analysisType;
-    }   
+    }
 
     public void setAnalysisType(String analysisType) {
         this.analysisType = analysisType;
@@ -56,14 +48,11 @@ public class AnalysisRequest {
         this.unit = unit;
     }
 
-    public String getCollectionDate() {
+    public LocalDate getCollectionDate() {
         return collectionDate;
     }
 
-    public void setCollectionDate(String collectionDate) {
+    public void setCollectionDate(LocalDate collectionDate) {
         this.collectionDate = collectionDate;
     }
-    
-
-
 }

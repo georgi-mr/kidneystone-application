@@ -16,6 +16,7 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "analyses")
 public class Analysis {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -42,11 +43,11 @@ public class Analysis {
     public Analysis() {
     }
 
-    public Analysis(String typeAnalysis, Double value, String unit, LocalDate date, User user) {
-        this.analysisType= typeAnalysis;
+    public Analysis(String analysisType, Double value, String unit, LocalDate collectionDate, User user) {
+        this.analysisType = analysisType;
         this.value = value;
         this.unit = unit;
-        this.collectionDate = date;
+        this.collectionDate = collectionDate;
         this.user = user;
         this.createdAt = LocalDateTime.now();
     }
@@ -55,12 +56,12 @@ public class Analysis {
         return id;
     }
 
-    public String getTipeAnalysis() {
+    public String getAnalysisType() {
         return analysisType;
     }
 
-    public void setTipeAnalysis(String tipeAnalysis) {
-        this.analysisType = tipeAnalysis;
+    public void setAnalysisType(String analysisType) {
+        this.analysisType = analysisType;
     }
 
     public Double getValue() {
@@ -79,12 +80,12 @@ public class Analysis {
         this.unit = unit;
     }
 
-    public LocalDate getDate() {
+    public LocalDate getCollectionDate() {
         return collectionDate;
     }
 
-    public void setDate(LocalDate date) {
-        this.collectionDate = date;
+    public void setCollectionDate(LocalDate collectionDate) {
+        this.collectionDate = collectionDate;
     }
 
     public LocalDateTime getCreatedAt() {

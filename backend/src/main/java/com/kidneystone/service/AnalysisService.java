@@ -5,97 +5,107 @@ import com.kidneystone.dto.AnalysisResponse;
 import com.kidneystone.model.Analysis;
 import com.kidneystone.model.User;
 import com.kidneystone.repository.AnalysisRepository;
-import com.kidneystone.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
 
-
 @Service
 public class AnalysisService {
-private final AnalysisRepository analysisRepository;
-private final UserRepository userRepository;
 
-public AnalysisService(AnalysisRepository analysisRepository, UserRepository userRepository) {
-    this.analysisRepository = analysisRepository;
-    this.userRepository = userRepository;
-}
+    private final AnalysisRepository analysisRepository;
 
-public  AnalysisResponse createAnalysis(AnalysisRequest request){
-    User user=getUserById(request.getUserId());
-    Analysis analysis=new Analysis(
-        request.getAnalysisType(),
-        request.getValue(),
-        request.getUnit(),
-        LocalDate.parse(request.getCollectionDate()),
-        user
-    );
-
-    Analysis savedAnalysis=analysisRepository.save(analysis);
-   return new AnalysisResponse(savedAnalysis);
-}
-
-public List<AnalysisResponse>getAnalysisResponses(Long userId,String analysisType, LocalDate collectionDate){
-    User user=getUserById(userId);
-    List<Analysis> analyses;
-
-    if(analysisType!=null && collectionDate!=null && !analysisType.isBlank()){
-        analyses=analysisRepository.findByUserAndAnalysisTypeContainingIgnoreCaseAndCollectionDate(user, analysisType, collectionDate);
-
-    } else if( analysisType!=null && !analysisType.isBlank()){
-        analyses=analysisRepository.findByUserAndAnalysisTypeContainingIgnoreCase(user, analysisType);
-
-    }else if(collectionDate!=null){
-        analyses=analysisRepository.findByUserAndCollectionDate(user, collectionDate);
-    } else{
-        analyses=analysisRepository.findByUser(user);
+    public AnalysisService(AnalysisRepository analysisRepository) {
+        this.analysisRepository = analysisRepository;
     }
 
-    return analyses.stream().map(AnalysisResponse::new).toList();
-    
-}
+    public AnalysisResponse createAnalysis(User authenticatedUser, AnalysisRequest request) {
+        Analysis analysis = new Analysis(
+                request.getAnalysisType(),
+                request.getValue(),
+                request.getUnit(),
+                request.getCollectionDate(),
+                authenticatedUser
+        );
 
-public AnalysisResponse getAnalysisById(Long id, Long userId){
-    User user=getUserById(userId);
-    Analysis analysis=analysisRepository.findById(id)
-    .orElseThrow(()->new RuntimeException("Analysis not found"));
-    validateAnalysisOwner(analysis,user);
-    return new AnalysisResponse(analysis);
-    
-}
+        Analysis savedAnalysis = analysisRepository.save(analysis);
 
-public AnalysisResponse updateAnalysis(Long id, AnalysisRequest request){
-    User user=getUserById(request.getUserId());
-   Analysis analysis=analysisRepository.findById(id)
-   .orElseThrow(()->new RuntimeException("Analysis not found"));
-   validateAnalysisOwner(analysis,user);  
-   analysis.setTipeAnalysis(request.getAnalysisType());
-   analysis.setValue(request.getValue());
-   analysis.setUnit(request.getUnit());
-   analysis.setDate(LocalDate.parse(request.getCollectionDate()));
-   Analysis updatedAnalysis=analysisRepository.save(analysis);
-   return new AnalysisResponse(updatedAnalysis);  
+        return new AnalysisResponse(savedAnalysis);
+    }
 
-}
+    public List<AnalysisResponse> getAnalyses(
+            User authenticatedUser,
+            String analysisType,
+            LocalDate collectionDate
+    ) {
+        List<Analysis> analyses;
 
-public void deleteAnalysis(Long id, Long userId){
-    User user=getUserById(userId);
-    Analysis analysis=analysisRepository.findById(id)
-    .orElseThrow(()->new RuntimeException("Analysis not found"));
-    validateAnalysisOwner(analysis,user);
-    analysisRepository.delete(analysis);
-}
+        if (analysisType != null && !analysisType.isBlank() && collectionDate != null) {
+            analyses = analysisRepository.findByUserAndAnalysisTypeContainingIgnoreCaseAndCollectionDate(
+                    authenticatedUser,
+                    analysisType,
+                    collectionDate
+            );
+        } else if (analysisType != null && !analysisType.isBlank()) {
+            analyses = analysisRepository.findByUserAndAnalysisTypeContainingIgnoreCase(
+                    authenticatedUser,
+                    analysisType
+            );
+        } else if (collectionDate != null) {
+            analyses = analysisRepository.findByUserAndCollectionDate(
+                    authenticatedUser,
+                    collectionDate
+            );
+        } else {
+            analyses = analysisRepository.findByUser(authenticatedUser);
+        }
 
-private void validateAnalysisOwner(Analysis analysis, User user) {
-   if(!analysis.getUser().getId().equals(user.getId())){
-    throw new RuntimeException("Unauthorized access to analysis");
-   }
-}
+        return analyses.stream()
+                .map(AnalysisResponse::new)
+                .toList();
+    }
 
-private User getUserById(Long userId) {
-    return userRepository.findById(userId)
-    .orElseThrow(()->new RuntimeException("User not found"));
-}
+    public AnalysisResponse getAnalysisById(Long id, User authenticatedUser) {
+        Analysis analysis = analysisRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Analysis not found"));
 
+        validateAnalysisOwner(analysis, authenticatedUser);
+
+        return new AnalysisResponse(analysis);
+    }
+
+    public AnalysisResponse updateAnalysis(
+            Long id,
+            User authenticatedUser,
+            AnalysisRequest request
+    ) {
+        Analysis analysis = analysisRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Analysis not found"));
+
+        validateAnalysisOwner(analysis, authenticatedUser);
+
+        analysis.setAnalysisType(request.getAnalysisType());
+        analysis.setValue(request.getValue());
+        analysis.setUnit(request.getUnit());
+        analysis.setCollectionDate(request.getCollectionDate());
+
+        Analysis updatedAnalysis = analysisRepository.save(analysis);
+
+        return new AnalysisResponse(updatedAnalysis);
+    }
+
+    public void deleteAnalysis(Long id, User authenticatedUser) {
+        Analysis analysis = analysisRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Analysis not found"));
+
+        validateAnalysisOwner(analysis, authenticatedUser);
+
+        analysisRepository.delete(analysis);
+    }
+
+    private void validateAnalysisOwner(Analysis analysis, User authenticatedUser) {
+        if (!analysis.getUser().getId().equals(authenticatedUser.getId())) {
+            throw new RuntimeException("You are not allowed to access this analysis");
+        }
+    }
 }
