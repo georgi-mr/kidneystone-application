@@ -1,13 +1,14 @@
 package com.kidneystone.service;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
 import com.kidneystone.dto.AuthResponse;
 import com.kidneystone.dto.LoginRequest;
 import com.kidneystone.dto.RegisterRequest;
 import com.kidneystone.model.User;
 import com.kidneystone.repository.UserRepository;
 import com.kidneystone.security.JwtService;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
 
 @Service
 public class AuthService {
@@ -15,15 +16,18 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final EmailService emailService;
 
     public AuthService(
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
-            JwtService jwtService
+            JwtService jwtService,
+            EmailService emailService
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
+        this.emailService = emailService;
     }
 
     public AuthResponse register(RegisterRequest request) {
@@ -46,9 +50,25 @@ public class AuthService {
 
         User savedUser = userRepository.save(user);
 
+        String token = jwtService.generateToken(savedUser);
+
+        try {
+            emailService.sendEmail(
+                    savedUser.getEmail(),
+                    "Welcome to KidneyStone Manager",
+                    "Hello " + savedUser.getUsername() + ",\n\n"
+                            + "Your KidneyStone Manager account was created successfully.\n\n"
+                            + "You can now log in and manage your kidney stone analysis records.\n\n"
+                            + "Best regards,\n"
+                            + "KidneyStone Manager"
+            );
+        } catch (Exception e) {
+            System.out.println("Email could not be sent: " + e.getMessage());
+        }
+
         return new AuthResponse(
                 "User registered successfully",
-                null,
+                token,
                 savedUser.getId(),
                 savedUser.getUsername(),
                 savedUser.getEmail()
