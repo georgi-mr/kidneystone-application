@@ -36,6 +36,18 @@ public class Analysis {
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @Column(columnDefinition = "TEXT")
+    private String aiInterpretation;
+
+    @Column
+    private String fileName;
+
+    @Column
+    private String filePath;
+
+    @Column
+    private String fileType;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -103,4 +115,37 @@ public class Analysis {
     public void setUser(User user) {
         this.user = user;
     }
+
+    public String getAiInterpretation() {
+        return aiInterpretation;
+    }
+
+    public void setAiInterpretation(String aiInterpretation) {
+        this.aiInterpretation = aiInterpretation;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
+
+    public String getFileType() {
+        return fileType;
+    }
+
+    public void setFileType(String fileType) {
+        this.fileType = fileType;
+    }
+
 }

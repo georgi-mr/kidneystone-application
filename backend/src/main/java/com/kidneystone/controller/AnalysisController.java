@@ -9,7 +9,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -26,9 +26,17 @@ public class AnalysisController {
     @PostMapping
     public ResponseEntity<AnalysisResponse> createAnalysis(
             @AuthenticationPrincipal User authenticatedUser,
-            @Valid @RequestBody AnalysisRequest request
-    ) {
+            @Valid @RequestBody AnalysisRequest request) {
         AnalysisResponse response = analysisService.createAnalysis(authenticatedUser, request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/{id}/file")
+    public ResponseEntity<AnalysisResponse> uploadFile(
+            @PathVariable Long id,
+            @AuthenticationPrincipal User authenticatedUser,
+            @RequestParam("file") MultipartFile file) {
+        AnalysisResponse response = analysisService.attachFile(id, authenticatedUser, file);
         return ResponseEntity.ok(response);
     }
 
@@ -36,15 +44,11 @@ public class AnalysisController {
     public ResponseEntity<List<AnalysisResponse>> getAnalyses(
             @AuthenticationPrincipal User authenticatedUser,
             @RequestParam(required = false) String analysisType,
-            @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate collectionDate
-    ) {
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate collectionDate) {
         List<AnalysisResponse> analyses = analysisService.getAnalyses(
                 authenticatedUser,
                 analysisType,
-                collectionDate
-        );
+                collectionDate);
 
         return ResponseEntity.ok(analyses);
     }
@@ -52,8 +56,7 @@ public class AnalysisController {
     @GetMapping("/{id}")
     public ResponseEntity<AnalysisResponse> getAnalysisById(
             @AuthenticationPrincipal User authenticatedUser,
-            @PathVariable Long id
-    ) {
+            @PathVariable Long id) {
         AnalysisResponse response = analysisService.getAnalysisById(id, authenticatedUser);
         return ResponseEntity.ok(response);
     }
@@ -62,8 +65,7 @@ public class AnalysisController {
     public ResponseEntity<AnalysisResponse> updateAnalysis(
             @AuthenticationPrincipal User authenticatedUser,
             @PathVariable Long id,
-            @Valid @RequestBody AnalysisRequest request
-    ) {
+            @Valid @RequestBody AnalysisRequest request) {
         AnalysisResponse response = analysisService.updateAnalysis(id, authenticatedUser, request);
         return ResponseEntity.ok(response);
     }
@@ -71,8 +73,7 @@ public class AnalysisController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAnalysis(
             @AuthenticationPrincipal User authenticatedUser,
-            @PathVariable Long id
-    ) {
+            @PathVariable Long id) {
         analysisService.deleteAnalysis(id, authenticatedUser);
         return ResponseEntity.noContent().build();
     }

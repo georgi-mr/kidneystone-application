@@ -2,8 +2,6 @@ package com.kidneystone.exception;
 
 import java.time.LocalDateTime;
 
-import org.springframework.cglib.core.Local;
-
 public class ApiError {
     private  LocalDateTime timestamp;
     private int status;
@@ -27,6 +25,6 @@ public class ApiError {
     public String getMessage() {
         return message;
     }
-    
+
     
 }

@@ -14,6 +14,10 @@ public class AnalysisResponse {
     private LocalDate collectionDate;
     private LocalDateTime createdAt;
     private Long userId;
+    private String aiInterpretation;
+    private String fileName;
+    private String filePath;
+    private String fileType;
 
     public AnalysisResponse(Analysis analysis) {
         this.id = analysis.getId();
@@ -23,6 +27,10 @@ public class AnalysisResponse {
         this.collectionDate = analysis.getCollectionDate();
         this.createdAt = analysis.getCreatedAt();
         this.userId = analysis.getUser().getId();
+        this.aiInterpretation = analysis.getAiInterpretation();
+        this.fileName = analysis.getFileName();
+        this.filePath = analysis.getFilePath();
+        this.fileType = analysis.getFileType();
     }
 
     public Long getId() {
@@ -51,5 +59,21 @@ public class AnalysisResponse {
 
     public Long getUserId() {
         return userId;
+    }
+
+    public String getAiInterpretation() {
+        return aiInterpretation;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public String getFileType() {
+        return fileType;
     }
 }

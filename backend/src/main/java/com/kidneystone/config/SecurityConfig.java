@@ -11,8 +11,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.kidneystone.security.JwtAuthentificationFilter;
 
-import io.jsonwebtoken.Jwt;
-
 @Configuration
 public class SecurityConfig {
 

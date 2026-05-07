@@ -6,6 +6,7 @@ import com.kidneystone.model.Analysis;
 import com.kidneystone.model.User;
 import com.kidneystone.repository.AnalysisRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -14,9 +15,11 @@ import java.util.List;
 public class AnalysisService {
 
     private final AnalysisRepository analysisRepository;
+    private final FileStorageService fileStorageService;
 
     public AnalysisService(AnalysisRepository analysisRepository) {
         this.analysisRepository = analysisRepository;
+        this.fileStorageService = new FileStorageService();
     }
 
     public AnalysisResponse createAnalysis(User authenticatedUser, AnalysisRequest request) {
@@ -25,8 +28,7 @@ public class AnalysisService {
                 request.getValue(),
                 request.getUnit(),
                 request.getCollectionDate(),
-                authenticatedUser
-        );
+                authenticatedUser);
 
         Analysis savedAnalysis = analysisRepository.save(analysis);
 
@@ -36,26 +38,22 @@ public class AnalysisService {
     public List<AnalysisResponse> getAnalyses(
             User authenticatedUser,
             String analysisType,
-            LocalDate collectionDate
-    ) {
+            LocalDate collectionDate) {
         List<Analysis> analyses;
 
         if (analysisType != null && !analysisType.isBlank() && collectionDate != null) {
             analyses = analysisRepository.findByUserAndAnalysisTypeContainingIgnoreCaseAndCollectionDate(
                     authenticatedUser,
                     analysisType,
-                    collectionDate
-            );
+                    collectionDate);
         } else if (analysisType != null && !analysisType.isBlank()) {
             analyses = analysisRepository.findByUserAndAnalysisTypeContainingIgnoreCase(
                     authenticatedUser,
-                    analysisType
-            );
+                    analysisType);
         } else if (collectionDate != null) {
             analyses = analysisRepository.findByUserAndCollectionDate(
                     authenticatedUser,
-                    collectionDate
-            );
+                    collectionDate);
         } else {
             analyses = analysisRepository.findByUser(authenticatedUser);
         }
@@ -77,8 +75,7 @@ public class AnalysisService {
     public AnalysisResponse updateAnalysis(
             Long id,
             User authenticatedUser,
-            AnalysisRequest request
-    ) {
+            AnalysisRequest request) {
         Analysis analysis = analysisRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Analysis not found"));
 
@@ -101,6 +98,23 @@ public class AnalysisService {
         validateAnalysisOwner(analysis, authenticatedUser);
 
         analysisRepository.delete(analysis);
+    }
+
+    public AnalysisResponse attachFile(Long id, User authenticatedUser, MultipartFile file) {
+        Analysis analysis = analysisRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Analysis not found"));
+
+        validateAnalysisOwner(analysis, authenticatedUser);
+
+        String filePath = fileStorageService.saveFile(file);
+
+        analysis.setFileName(file.getOriginalFilename());
+        analysis.setFilePath(filePath);
+        analysis.setFileType(file.getContentType());
+
+        Analysis savedAnalysis = analysisRepository.save(analysis);
+
+        return new AnalysisResponse(savedAnalysis);
     }
 
     private void validateAnalysisOwner(Analysis analysis, User authenticatedUser) {
