@@ -26,6 +26,6 @@ frontend/.vite/
 
 # Spring Boot / Java
 backend/target/
-
+backend/uploads/
 # Java compiled files
 *.class
