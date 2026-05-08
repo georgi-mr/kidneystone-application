@@ -2,14 +2,24 @@ package com.kidneystone.controller;
 
 import com.kidneystone.dto.AnalysisRequest;
 import com.kidneystone.dto.AnalysisResponse;
+import com.kidneystone.model.Analysis;
 import com.kidneystone.model.User;
 import com.kidneystone.service.AnalysisService;
+
 import jakarta.validation.Valid;
+
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.net.MalformedURLException;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -76,5 +86,35 @@ public class AnalysisController {
             @PathVariable Long id) {
         analysisService.deleteAnalysis(id, authenticatedUser);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}/file/download")
+    public ResponseEntity<Resource> downloadFile(
+            @PathVariable Long id,
+            @AuthenticationPrincipal User authenticatedUser) {
+        Analysis analysis = analysisService.getAnalysisEntityById(id, authenticatedUser);
+
+        if (analysis.getFilePath() == null || analysis.getFileName() == null) {
+            throw new RuntimeException("No file attached to this analysis");
+        }
+
+        try {
+            Path filePath = Path.of(analysis.getFilePath());
+            Resource resource = new UrlResource(filePath.toUri());
+
+            if (!resource.exists() || !resource.isReadable()) {
+                throw new RuntimeException("File not found or not readable");
+            }
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .header(
+                            HttpHeaders.CONTENT_DISPOSITION,
+                            "attachment; filename=\"" + analysis.getFileName() + "\"")
+                    .body(resource);
+
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Could not download file", e);
+        }
     }
 }

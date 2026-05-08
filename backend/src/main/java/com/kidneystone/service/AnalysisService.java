@@ -17,9 +17,11 @@ public class AnalysisService {
     private final AnalysisRepository analysisRepository;
     private final FileStorageService fileStorageService;
 
-    public AnalysisService(AnalysisRepository analysisRepository) {
+    public AnalysisService(
+            AnalysisRepository analysisRepository,
+            FileStorageService fileStorageService) {
         this.analysisRepository = analysisRepository;
-        this.fileStorageService = new FileStorageService();
+        this.fileStorageService = fileStorageService;
     }
 
     public AnalysisResponse createAnalysis(User authenticatedUser, AnalysisRequest request) {
@@ -122,4 +124,14 @@ public class AnalysisService {
             throw new RuntimeException("You are not allowed to access this analysis");
         }
     }
+
+    public Analysis getAnalysisEntityById(Long id, User authenticatedUser) {
+    Analysis analysis = analysisRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Analysis not found"));
+
+    validateAnalysisOwner(analysis, authenticatedUser);
+
+    return analysis;
+}
+
 }
