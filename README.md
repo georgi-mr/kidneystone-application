@@ -911,7 +911,7 @@ SendGrid API
 
 ## 5. Capturi ecran aplicație
 
-Capturile de ecran vor fi salvate în folderul:
+Capturile de ecran sunt salvate în folderul:
 
 ```text
 docs/images/
@@ -925,6 +925,8 @@ docs/images/
 
 ![Register](docs/images/register.png)
 
+![Email](docs/images/email-confirm-register.png)
+
 ### Dashboard
 
 ![Dashboard](docs/images/dashboard.png)
@@ -933,21 +935,24 @@ docs/images/
 
 ![Add Analysis](docs/images/add-analysis.png)
 
+### Edit Analysis
+![Edit Analysis](docs/images/edit-analysis.png)
+
 ### Listă analize
 
 ![Analyses List](docs/images/analyses-list.png)
 
 ### Search / filtrare analize
 
-![Search Analyses](docs/images/search-analyses.png)
+![Search Analyses](docs/images/search-analyses-name.png)(docs/images/search-analyses-collection-date.png)(docs/images/search-analyses.png)
 
 ### Interpretare AI
 
-![AI Interpretation](docs/images/ai-interpretation.png)
+![AI Interpretation](docs/images/ai-interpretation.png)(docs/images/ai-interpretation-load.png)(docs/images/ai-interpretation.png)
 
 ### Upload fișier
 
-![Upload File](docs/images/upload-file.png)
+![Upload File](docs/images/upload-selection-file.png)(docs/images/upload-file.png)
 
 ### Download fișier
 
@@ -962,19 +967,13 @@ Aplicația va fi publicată folosind o platformă cloud.
 Link aplicație publicată:
 
 ```text
-TODO: adaugă aici linkul aplicației publicate
-```
-
-Link repository GitHub:
-
-```text
-TODO: adaugă aici linkul repository-ului GitHub
+https://kidneystone-application-production-e99f.up.railway.app/
 ```
 
 Link video prezentare:
 
 ```text
-TODO: adaugă aici linkul video YouTube
+https://drive.google.com/drive/folders/1a_USeUuW-yMq7Ydul_hQ1Q5vbMOVDKHI
 ```
 
 ---
